@@ -12,13 +12,14 @@ body {
 }
 
 .app-shell {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
+  gap: 2rem;
   min-height: 100vh;
   padding: 2rem;
 }
 
-.app-shell section {
+.intro-panel {
   max-width: 42rem;
 }
 
@@ -32,4 +33,77 @@ body {
   color: #475569;
   font-size: 1.125rem;
   margin: 0;
+}
+
+.app-shell button,
+.error-panel select,
+.error-panel textarea {
+  font: inherit;
+}
+
+.app-shell button {
+  background: #2563eb;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.error-panel {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  box-shadow: 0 1rem 2rem rgb(15 23 42 / 8%);
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.error-panel h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.error-panel label {
+  color: #334155;
+  display: grid;
+  font-weight: 700;
+  gap: 0.35rem;
+}
+
+.error-panel select,
+.error-panel textarea {
+  border: 1px solid #94a3b8;
+  border-radius: 0.375rem;
+  color: #0f172a;
+  padding: 0.65rem;
+}
+
+.inline-error {
+  color: #b91c1c;
+  font-size: 0.95rem;
+}
+
+.retry-summary {
+  background: #ecfdf5;
+  border: 1px solid #86efac;
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem;
+}
+
+.retry-summary span {
+  color: #166534;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    flex-direction: column;
+  }
 }
