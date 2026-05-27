@@ -18,6 +18,9 @@ body {
   padding: 3rem 2rem;
 }
 
+.chat-panel {
+  max-width: 42rem;
+  width: 100%;
 .workspace-panel {
   max-width: 42rem;
   width: 100%;
@@ -54,6 +57,89 @@ body {
   margin: 0;
 }
 
+.chat-panel__header {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+button {
+  background: #0f172a;
+  border: 0;
+  border-radius: 0.375rem;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.625rem 0.875rem;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: #1e293b;
+}
+
+.message-list {
+  border-top: 1px solid #cbd5e1;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+}
+
+.message {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.message span {
+  color: #64748b;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  text-transform: capitalize;
+}
+
+.clear-chat-form {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.clear-chat-form label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.clear-chat-form div {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.clear-chat-form input {
+  border: 1px solid #94a3b8;
+  border-radius: 0.375rem;
+  flex: 1;
+  font: inherit;
+  min-width: 0;
+  padding: 0.625rem;
+}
+
+.clear-chat-form__error {
+  color: #b91c1c;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+@media (max-width: 40rem) {
+  .chat-panel__header,
+  .clear-chat-form div {
+    align-items: stretch;
+    flex-direction: column;
 .workspace-copy {
   margin-bottom: 1.5rem;
 }
