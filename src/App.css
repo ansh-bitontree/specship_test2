@@ -12,21 +12,43 @@ body {
 }
 
 .app-shell {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 3rem 2rem;
 }
 
 .chat-panel {
   max-width: 42rem;
   width: 100%;
+.workspace-panel {
+  max-width: 42rem;
+  width: 100%;
+.conversation-workspace {
+  display: grid;
+  gap: 2rem;
+  max-width: 46rem;
+  width: 100%;
+}
+
+.conversation-header {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.eyebrow {
+  color: #0f766e;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin: 0;
+  text-transform: uppercase;
 }
 
 .app-shell h1 {
   font-size: 2.5rem;
   line-height: 1.1;
-  margin: 0 0 1rem;
+  margin: 0;
 }
 
 .app-shell p {
@@ -118,5 +140,170 @@ button:hover {
   .clear-chat-form div {
     align-items: stretch;
     flex-direction: column;
+.workspace-copy {
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  color: #2563eb;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.primary-action {
+  background: #1d4ed8;
+  border: 0;
+  border-radius: 0.5rem;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+}
+
+.primary-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.gemini-panel,
+.gemini-result {
+  border-top: 1px solid #dbe3ef;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.gemini-panel label,
+.gemini-result h2 {
+  color: #111827;
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.gemini-panel textarea {
+  border: 1px solid #94a3b8;
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  display: block;
+  font: inherit;
+  min-height: 8rem;
+.message-form {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.message-form label,
+.history-panel h2 {
+  color: #111827;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.message-form-row {
+  align-items: stretch;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.message-form textarea {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  color: #111827;
+  font: inherit;
+  min-height: 7rem;
+  padding: 0.75rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.inline-error {
+  color: #b91c1c;
+  font-size: 0.95rem;
+  margin-top: 0.75rem;
+}
+
+.prompt-label {
+  color: #334155;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+.message-form textarea:focus {
+  border-color: #0f766e;
+  outline: 3px solid #99f6e4;
+}
+
+.message-form button {
+  align-self: start;
+  background: #0f766e;
+  border: 0;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+}
+
+.message-form button:hover {
+  background: #115e59;
+}
+
+.form-error {
+  color: #b42318;
+  font-size: 0.9375rem;
+  font-weight: 700;
+}
+
+.history-panel {
+  border-top: 1px solid #dbe4ef;
+  display: grid;
+  gap: 1rem;
+  padding-top: 1.5rem;
+}
+
+.history-panel ul {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-panel li {
+  background: #ffffff;
+  border: 1px solid #dbe4ef;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+}
+
+.history-panel span {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 2rem 1rem;
+  }
+
+  .app-shell h1 {
+    font-size: 2rem;
+  }
+
+  .message-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .message-form button {
+    justify-self: start;
   }
 }
