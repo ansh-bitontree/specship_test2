@@ -12,10 +12,10 @@ body {
 }
 
 .app-shell {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 4rem 2rem;
 }
 
 .workspace-panel {
