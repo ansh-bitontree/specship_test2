@@ -1,7 +1,11 @@
 import httpx
 from fastapi.testclient import TestClient
+from pathlib import Path
 
 from backend.main import app
+
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_gemini_chat_rejects_empty_messages():
@@ -109,3 +113,20 @@ def test_gemini_http_failures_return_sanitized_error(monkeypatch):
     assert response.status_code == 502
     assert response.json()["detail"] == "Gemini request failed. Try again later."
     assert api_key not in response.text
+
+
+def test_local_setup_files_document_env_and_required_dependencies():
+    requirements = (ROOT / "requirements.txt").read_text()
+    requirements_dev = (ROOT / "requirements-dev.txt").read_text()
+    env_example = (ROOT / "backend" / ".env.example").read_text()
+    gitignore = (ROOT / ".gitignore").read_text()
+
+    assert "python-dotenv" in requirements
+    assert "trio" in requirements
+    assert "anyio<4.13" in requirements
+    assert "httpcore" in requirements
+    assert "pytest" in requirements_dev
+    assert "GEMINI_API_KEY=" in env_example
+    assert "GEMINI_MODEL=gemini-3.5-flash" in env_example
+    assert ".env" in gitignore
+    assert "backend/.env" in gitignore
