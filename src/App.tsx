@@ -1,3 +1,4 @@
+import { type FormEvent, useState } from 'react';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import './App.css';
@@ -51,6 +52,28 @@ function writeStoredResult(result: LoadingIndicatorResult) {
   window.localStorage.setItem(resultStorageKey, JSON.stringify(result));
 }
 
+interface GeminiIntegrationState {
+  lastPrompt: string;
+  lastResponse: string;
+}
+
+const geminiStorageKey = 'geminiIntegrationState';
+
+function loadGeminiState(): GeminiIntegrationState | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const value = window.localStorage.getItem(geminiStorageKey);
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(value) as GeminiIntegrationState;
+  } catch {
+    window.localStorage.removeItem(geminiStorageKey);
+    return null;
 type Message = {
   id: string;
   role: 'user';
@@ -81,6 +104,50 @@ function readSavedConversation(): Message[] {
 }
 
 export function App() {
+  const [isGeminiOpen, setIsGeminiOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [geminiState, setGeminiState] = useState<GeminiIntegrationState | null>(() =>
+    loadGeminiState(),
+  );
+
+  async function handleGeminiSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const trimmedMessage = message.trim();
+    if (!trimmedMessage) {
+      setError('Enter a message before sending.');
+      return;
+    }
+
+    setError('');
+    setIsSending(true);
+
+    try {
+      const response = await fetch('/api/gemini/chat', {
+        body: JSON.stringify({ message: trimmedMessage }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Gemini request failed.');
+      }
+
+      const data = (await response.json()) as { content?: string };
+      const nextState = {
+        lastPrompt: trimmedMessage,
+        lastResponse: data.content ?? '',
+      };
+      window.localStorage.setItem(geminiStorageKey, JSON.stringify(nextState));
+      setGeminiState(nextState);
+      setMessage('');
+    } catch {
+      setError('Gemini could not respond. Try again.');
+    } finally {
+      setIsSending(false);
+    }
   const [messages, setMessages] = useState<Message[]>(readSavedConversation);
   const [messageText, setMessageText] = useState('');
   const [error, setError] = useState('');
@@ -162,6 +229,29 @@ export function App() {
 
   return (
     <main className="app-shell">
+      <section className="workspace-panel">
+        <div className="workspace-copy">
+          <p className="eyebrow">Main authenticated experience</p>
+          <h1>Authenticated workspace</h1>
+          <p>Connect Gemini through the secure backend proxy without exposing API keys.</p>
+        </div>
+
+        <button
+          className="primary-action"
+          type="button"
+          onClick={() => setIsGeminiOpen((isOpen) => !isOpen)}
+        >
+          Gemini API Integration
+        </button>
+
+        {isGeminiOpen ? (
+          <form className="gemini-panel" onSubmit={handleGeminiSubmit}>
+            <label htmlFor="gemini-message">Message for Gemini</label>
+            <textarea
+              id="gemini-message"
+              value={message}
+              onChange={(event) => {
+                setMessage(event.target.value);
       <section className="conversation-workspace" aria-labelledby="message-history-heading">
         <div className="conversation-header">
           <p className="eyebrow">Authenticated workspace</p>
@@ -183,6 +273,54 @@ export function App() {
                   setError('');
                 }
               }}
+              rows={4}
+            />
+            {error ? <p className="inline-error">{error}</p> : null}
+            <button className="primary-action" type="submit" disabled={isSending}>
+              {isSending ? 'Sending...' : 'Send to Gemini'}
+            </button>
+          </form>
+        ) : null}
+
+        {geminiState ? (
+          <section className="gemini-result" aria-label="Last Gemini response">
+            <h2>Last Gemini response</h2>
+            <p className="prompt-label">Prompt: {geminiState.lastPrompt}</p>
+            <p>{geminiState.lastResponse}</p>
+        {savedPlan ? (
+          <section className="saved-plan" aria-label="Saved error handling plan">
+            <p className="status">{savedPlan.status}</p>
+            <h2>{failureTypeLabels[savedPlan.failureType]}</h2>
+            <p>{savedPlan.details}</p>
+            <button type="button" onClick={handleRetry}>
+              Retry now
+            </button>
+      <section className="loading-workflow" aria-labelledby="loading-workflow-title">
+        <p className="eyebrow">Authenticated workspace</p>
+        <h1 id="loading-workflow-title">AI Response Loading Indicator</h1>
+        <p>
+          Send a prompt and watch the processing state before the response is saved.
+        </p>
+
+        <form className="prompt-form" onSubmit={submitPrompt} noValidate>
+          <label htmlFor="prompt">Prompt</label>
+          <textarea
+            id="prompt"
+            name="prompt"
+            onChange={(event) => {
+              setPrompt(event.target.value);
+              if (error) {
+                setError('');
+              }
+            }}
+            rows={4}
+            value={prompt}
+          />
+          {error ? <p className="field-error">{error}</p> : null}
+
+          <button disabled={isLoading} type="submit">
+            {isLoading ? 'Sending...' : 'Send prompt'}
+          </button>
             />
             <button type="submit">Save Message</button>
           </div>
