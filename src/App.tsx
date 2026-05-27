@@ -1,6 +1,55 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import './App.css';
+import { useState, type FormEvent } from 'react';
+
+const ERROR_PLAN_STORAGE_KEY = 'specship:error-handling-plan';
+
+type FailureType = 'api-failure' | 'network-issue' | 'rate-limit';
+
+interface ErrorHandlingPlan {
+  failureType: FailureType;
+  details: string;
+  status: string;
+  attempts: number;
+  updatedAt: number;
+}
+
+const failureTypeLabels: Record<FailureType, string> = {
+  'api-failure': 'API failure',
+  'network-issue': 'Network issue',
+  'rate-limit': 'Rate limit',
+};
+
+function loadErrorHandlingPlan(): ErrorHandlingPlan | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const storedPlan = window.localStorage.getItem(ERROR_PLAN_STORAGE_KEY);
+  return storedPlan ? (JSON.parse(storedPlan) as ErrorHandlingPlan) : null;
+}
+
+function persistErrorHandlingPlan(plan: ErrorHandlingPlan) {
+  window.localStorage.setItem(ERROR_PLAN_STORAGE_KEY, JSON.stringify(plan));
+}
+
+interface LoadingIndicatorResult {
+  prompt: string;
+  response: string;
+  completedAt: number;
+}
+
+const resultStorageKey = 'loading-indicator-result';
+
+function readStoredResult() {
+  const storedResult = window.localStorage.getItem(resultStorageKey);
+  return storedResult ? (JSON.parse(storedResult) as LoadingIndicatorResult) : null;
+}
+
+function writeStoredResult(result: LoadingIndicatorResult) {
+  window.localStorage.setItem(resultStorageKey, JSON.stringify(result));
+}
 
 type Message = {
   id: string;
@@ -44,6 +93,13 @@ export function App() {
 
     localStorage.setItem(conversationStorageKey, JSON.stringify(conversation));
   }, [messages]);
+  const [isWorkflowOpen, setIsWorkflowOpen] = useState(false);
+  const [failureType, setFailureType] = useState<FailureType>('api-failure');
+  const [details, setDetails] = useState('');
+  const [inlineMessage, setInlineMessage] = useState('');
+  const [savedPlan, setSavedPlan] = useState<ErrorHandlingPlan | null>(() =>
+    loadErrorHandlingPlan(),
+  );
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -68,6 +124,40 @@ export function App() {
     ]);
     setMessageText('');
     setError('');
+    const trimmedDetails = details.trim();
+    if (!trimmedDetails) {
+      setInlineMessage('Describe the error before saving a retry plan.');
+      return;
+    }
+
+    const plan: ErrorHandlingPlan = {
+      failureType,
+      details: trimmedDetails,
+      status: 'Ready to retry',
+      attempts: savedPlan?.attempts ?? 0,
+      updatedAt: Date.now(),
+    };
+
+    persistErrorHandlingPlan(plan);
+    setSavedPlan(plan);
+    setInlineMessage('');
+    setDetails('');
+  }
+
+  function handleRetry() {
+    if (!savedPlan) {
+      return;
+    }
+
+    const retriedPlan = {
+      ...savedPlan,
+      attempts: savedPlan.attempts + 1,
+      status: 'Retry queued',
+      updatedAt: Date.now(),
+    };
+
+    persistErrorHandlingPlan(retriedPlan);
+    setSavedPlan(retriedPlan);
   }
 
   return (
