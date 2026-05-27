@@ -12,12 +12,15 @@ body {
 }
 
 .app-shell {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   min-height: 100vh;
-  padding: 2rem;
+  padding: 4rem 2rem;
 }
 
+.workspace {
+  max-width: 42rem;
+  width: 100%;
 .loading-workflow {
   max-width: 42rem;
   width: 100%;
@@ -44,6 +47,83 @@ body {
   margin: 0;
 }
 
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+}
+
+.primary-action {
+  background: #2563eb;
+  color: #ffffff;
+  margin-top: 1.5rem;
+}
+
+.error-workflow,
+.saved-plan {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+}
+
+.error-workflow {
+  display: grid;
+  gap: 1rem;
+}
+
+.error-workflow label {
+  color: #334155;
+  display: grid;
+  font-weight: 700;
+  gap: 0.5rem;
+}
+
+.error-workflow select,
+.error-workflow textarea {
+  border: 1px solid #94a3b8;
+  border-radius: 0.375rem;
+  color: #0f172a;
+  padding: 0.75rem;
+}
+
+.error-workflow textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.inline-message {
+  color: #b91c1c;
+  font-weight: 700;
+}
+
+.saved-plan {
+  background: #ffffff;
+}
+
+.saved-plan h2 {
+  font-size: 1.25rem;
+  margin: 0.25rem 0 0.5rem;
+}
+
+.saved-plan button {
+  background: #0f172a;
+  color: #ffffff;
+  margin-top: 1rem;
+}
+
+.status {
+  color: #047857;
+  font-weight: 800;
+  text-transform: uppercase;
 .prompt-form {
   display: grid;
   gap: 0.75rem;

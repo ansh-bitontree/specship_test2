@@ -1,57 +1,53 @@
-import '@testing-library/jest-dom/vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { act } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+/**
+ * @vitest-environment jsdom
+ */
+import { cleanup, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
 
-describe('App loading state indicator', () => {
+describe('App error handling workflow', () => {
   beforeEach(() => {
-    localStorage.clear();
-    vi.useFakeTimers();
+    window.localStorage.clear();
   });
 
   afterEach(() => {
-    vi.runOnlyPendingTimers();
-    vi.useRealTimers();
+    cleanup();
   });
 
-  it('shows a visible entry point in the authenticated experience', () => {
-    render(<App />);
+  it('lets users record an error handling plan and see it after refresh', async () => {
+    const user = userEvent.setup();
 
-    expect(screen.getByRole('heading', { name: /ai response loading indicator/i })).toBeVisible();
-    expect(screen.getByLabelText(/prompt/i)).toBeVisible();
-    expect(screen.getByRole('button', { name: /send prompt/i })).toBeVisible();
-  });
-
-  it('blocks empty input with a clear inline message', () => {
-    render(<App />);
-
-    fireEvent.click(screen.getByRole('button', { name: /send prompt/i }));
-
-    expect(screen.getByText(/enter a prompt before sending/i)).toBeVisible();
-  });
-
-  it('shows loading feedback, completes with valid input, and persists the result after refresh', async () => {
     const { unmount } = render(<App />);
 
-    fireEvent.change(screen.getByLabelText(/prompt/i), {
-      target: { value: 'Summarize release notes' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /send prompt/i }));
+    await user.click(screen.getByRole('button', { name: /error handling/i }));
+    await user.selectOptions(screen.getByLabelText(/failure type/i), 'rate-limit');
+    await user.type(
+      screen.getByLabelText(/what happened/i),
+      '429 returned while syncing invoices',
+    );
+    await user.click(screen.getByRole('button', { name: /save retry plan/i }));
 
-    expect(screen.getByRole('status')).toHaveTextContent(/generating response/i);
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(700);
-    });
-
-    expect(screen.getByRole('heading', { name: /ai response ready/i })).toBeVisible();
-    expect(screen.getByText(/summarize release notes/i)).toBeVisible();
+    expect(screen.getByRole('heading', { name: /rate limit/i })).toBeTruthy();
+    expect(screen.getByText(/429 returned while syncing invoices/i)).toBeTruthy();
+    expect(screen.getByRole('button', { name: /retry now/i })).toBeTruthy();
 
     unmount();
     render(<App />);
 
-    expect(screen.getByRole('heading', { name: /ai response ready/i })).toBeVisible();
-    expect(screen.getByText(/summarize release notes/i)).toBeVisible();
+    expect(screen.getByText(/429 returned while syncing invoices/i)).toBeTruthy();
+    expect(screen.getByText(/ready to retry/i)).toBeTruthy();
+  });
+
+  it('blocks empty error details with a clear inline message', async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getByRole('button', { name: /error handling/i }));
+    await user.click(screen.getByRole('button', { name: /save retry plan/i }));
+
+    expect(screen.getByText(/describe the error before saving a retry plan/i)).toBeTruthy();
+    expect(window.localStorage.getItem('specship:error-handling-plan')).toBeNull();
   });
 });
